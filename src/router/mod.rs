@@ -4,7 +4,7 @@ use crate::config;
 use crate::config::CachePath;
 use crate::disk::CacheFile;
 use crate::util::metrics;
-use crossbeam_channel::Sender;
+use crossbeam::channel::Sender;
 use rocket::Data;
 use rocket::State;
 use std::fs;
@@ -60,7 +60,7 @@ pub fn upload(
     }
     let mut wfile = NamedTempFile::new_in(together.parent().unwrap()).unwrap();
     
-    let result = match zstd::stream::encode_all(paste.open(),5) {
+    let result = match zstd::stream::encode_all(paste.open(),7) {
         Ok(en) => en,
         Err(_) => {
             wfile.close().ok();
