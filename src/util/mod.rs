@@ -15,6 +15,7 @@ pub mod test_common;
 pub mod time;
 pub mod timer;
 pub mod worker;
+pub mod buffer;
 
 use std::thread;
 
