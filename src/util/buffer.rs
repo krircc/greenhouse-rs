@@ -1,7 +1,7 @@
 use std::cell::UnsafeCell;
+use std::mem;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
-use std::mem;
 
 /// A slot in buffer.
 #[derive(Debug)]
@@ -60,7 +60,7 @@ impl<T> Buffer<T> {
 
 impl<T> Drop for Buffer<T> {
     fn drop(&mut self) {
-        unsafe { 
+        unsafe {
             drop(Vec::from_raw_parts(self.ptr, 0, self.cap));
         }
     }
@@ -110,7 +110,10 @@ impl<T> Buffer<T> {
         let slot = self.at(index);
 
         // Writes the value.
-        (*slot).data.get().write_volatile(mem::ManuallyDrop::new(value));
+        (*slot)
+            .data
+            .get()
+            .write_volatile(mem::ManuallyDrop::new(value));
 
         // Writes the index with `Release`.
         (*slot).index.store(index, Ordering::Release);
@@ -132,5 +135,27 @@ impl<T> Buffer<T> {
     pub unsafe fn read_value(&self, offset: usize) -> mem::ManuallyDrop<T> {
         let slot = self.at(offset);
         (*slot).data.get().read_volatile()
+    }
+}
+
+/// The return type for `try_recv` methods.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TryRecv<T> {
+    /// Received a value.
+    Data(T),
+    /// Not received a value because the buffer is empty.
+    Empty,
+    /// Lost the race to a concurrent operation. Try again.
+    Retry,
+}
+
+impl<T> TryRecv<T> {
+    /// Applies a function to the content of `TryRecv::Data`.
+    pub fn map<U, F: FnOnce(T) -> U>(self, f: F) -> TryRecv<U> {
+        match self {
+            TryRecv::Data(v) => TryRecv::Data(f(v)),
+            TryRecv::Empty => TryRecv::Empty,
+            TryRecv::Retry => TryRecv::Retry,
+        }
     }
 }

@@ -2,6 +2,7 @@
 pub mod macros;
 pub mod bloomfilter;
 pub mod bloomfilter_simd;
+pub mod buffer;
 pub mod cache_padded;
 pub mod coding;
 pub mod hash_util;
@@ -13,8 +14,7 @@ pub mod status;
 pub mod test_common;
 pub mod time;
 pub mod timer;
-pub mod buffer;
-
+pub mod mp;
 
 use std::thread;
 
