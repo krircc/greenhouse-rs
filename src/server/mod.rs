@@ -4,3 +4,4 @@ pub mod error;
 pub mod http;
 pub mod lazygc;
 pub mod metric;
+pub mod storage;
