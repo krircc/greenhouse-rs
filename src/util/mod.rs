@@ -9,12 +9,13 @@ pub mod hash_util;
 pub mod logger;
 pub mod memory;
 pub mod metrics;
+pub mod mp;
 pub mod rocket_log;
+pub mod sp;
 pub mod status;
 pub mod test_common;
 pub mod time;
 pub mod timer;
-pub mod mp;
 
 use std::thread;
 
